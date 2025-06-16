@@ -1,0 +1,33 @@
+name: Auto-Scrape Kaito Leaderboard
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Runs daily at 8AM UTC
+  workflow_dispatch:     # Allow manual trigger
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run scraper
+      run: node scrape.cjs
+
+    - name: Commit and push updated JSON
+      run: |
+        git config user.name "mira-bot"
+        git config user.email "bot@kaito-scraper.com"
+        git add kaito-leaderboard.json
+        git commit -m "🦾 Auto-update leaderboard"
+        git push
